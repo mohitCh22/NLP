@@ -1,0 +1,4 @@
+langchain_bot_venv/
+__pycache__/
+.git/
+.env

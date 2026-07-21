@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual Environment
+venv/
+.venv/
+env/
+langchain_bot_venv
+
+# IDE
+.vscode/
+.idea/
+
+# Environment Variables
+.env
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python cache
+.pytest_cache/
+.mypy_cache/
+
+# Local databases
+*.db
+
+# Build
+build/
+dist/
+
+# Large model files
+models/
+
+# Docker
+*.tar

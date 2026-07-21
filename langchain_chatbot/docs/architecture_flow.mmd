@@ -1,0 +1,49 @@
+flowchart TD
+    subgraph INGESTION["DATA INGESTION PIPELINE (run once)"]
+        A[("📄 Raw PDF/Text\nCPA2019.txt")] --> B["data_extraction.py\nExtract raw text"]
+        B --> C["data_preparation.py\nParse sections via regex"]
+        C --> D["chunking.py\nSplit into subsections\ne.g. (1), (2)…"]
+        D --> E[("💾 sections_debug.json\nChunked sections")]
+        E --> F["loader.py\nLoad as LangChain Documents\nwith metadata"]
+        F --> G["embeddings.py\nHuggingFace\nall-MiniLM-L6-v2"]
+        G --> H["vectorstore.py\nFAISS.from_documents()"]
+        H --> I[("🗂️ FAISS Index\ncpa_index.faiss")]
+    end
+
+    subgraph QUERY["QUERY PIPELINE (per request)"]
+        J["👤 User Question"] --> K["query_expansion.py\nclassify_query()\nIntent Detection"]
+        K --> L["rewrite_by_intent()\nGenerate mulLearn S3 and IAM basicstiple\nquery rewrites"]
+        L --> M["embeddings.py\nEmbed each query"]
+
+        subgraph RETRIEVAL["Hybrid Retrieval"]
+            M --> N["search_faiss.py\nFAISS Semantic Search\ntop-k=5"]
+            M --> O["bm25_search.py\nBM25 Keyword Search\nk=5"]
+        end
+
+        N --> P["Deduplicate &\nMerge Results"]
+        O --> P
+
+        I -.->|loaded at startup| Q["retriever.py\nMMR Retriever\nk=4, fetch_k=10"]
+        Q --> P
+    end
+
+    subgraph LLM_CHAIN["LLM CHAIN (chain.py)"]
+        P --> R["format_docs()\nFormat retrieved chunks\nwith section metadata"]
+        R --> S["prompt.py\nChatPromptTemplate\nSystem + User instructions"]
+        S --> T["llm_services.py /\nChatOpenAI gpt-4o-mini\ntemperature=0"]
+        T --> U["StrOutputParser()"]
+    end
+
+    subgraph SERVING["API & UI LAYER"]
+        U --> V["FastAPI /ask\napp.py\nReturns answer + sources"]
+        V --> W["Streamlit UI\nstreamlit_app.py\nChat interface + source expanders"]
+        W --> X["👤 User sees Answer\n+ cited sections"]
+    end
+
+    J --> RETRIEVAL
+    INGESTION -.->|"built once,\npersisted to disk"| I
+
+    style INGESTION fill:#1e3a5f,color:#fff,stroke:#4a90d9
+    style QUERY fill:#1a3a2a,color:#fff,stroke:#4aaa6a
+    style LLM_CHAIN fill:#3a1a2a,color:#fff,stroke:#aa4a8a
+    style SERVING fill:#3a2a00,color:#fff,stroke:#cc9900
