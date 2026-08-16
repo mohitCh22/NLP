@@ -16,7 +16,7 @@ from src.chatbot.retriever import get_retriever
 
 from src.chatbot.chain import build_chain
 
-from src.chatbot.config import FAISS_PATH
+from src.chatbot.config import FAISS_INDEX_PATH
 
 app = FastAPI()
 
@@ -25,7 +25,7 @@ app = FastAPI()
 embeddings = get_embedding_model()
 
 vectorstore = load_vectorstore(
-    FAISS_PATH,
+    FAISS_INDEX_PATH,
     embeddings
 )
 

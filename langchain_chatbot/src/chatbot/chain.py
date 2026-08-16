@@ -1,3 +1,4 @@
+from .config import LLM_MODEL, LLM_TEMPERATURE, LLM_TIMEOUT
 from operator import itemgetter
 
 from langchain_openai import ChatOpenAI
@@ -31,9 +32,9 @@ def format_docs(docs):
 def build_chain(retriever):
 
     llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0,
-        http_client=httpx.Client(verify=False, timeout=30.0),
+        model=LLM_MODEL,
+        temperature=LLM_TEMPERATURE,
+        http_client=httpx.Client(verify=False, timeout=LLM_TIMEOUT),
     )
 
     # Retrieve docs once and keep them alongside the question
