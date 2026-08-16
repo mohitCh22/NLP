@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 import sys
 
@@ -17,6 +18,12 @@ from src.chatbot.retriever import get_retriever
 from src.chatbot.chain import build_chain
 
 from src.chatbot.config import FAISS_INDEX_PATH
+
+from src.chatbot.logging_config import configure_logging
+
+configure_logging()
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -45,6 +52,8 @@ def root():
 
 @app.post("/ask")
 async def ask_question(request: QueryRequest):
+
+    logger.info("Received /ask request")
 
     result = await chain.ainvoke(request.question)
 
