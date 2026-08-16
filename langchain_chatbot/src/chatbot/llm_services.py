@@ -3,8 +3,7 @@ import os
 
 # from groq import Groq
 from openai import OpenAI
-from dotenv import load_dotenv
-
+from .config import (OPENAI_API_KEY, LLM_MODEL, LLM_TEMPERATURE, LLM_TIMEOUT)
 from .prompt import system_prompt, user_prompt
 
 import httpx
@@ -12,7 +11,6 @@ import httpx
 # if not os.getenv("GROQ_API_KEY"):
 #     raise RuntimeError("GROQ_API_KEY is not set")
 
-load_dotenv()
 
 # _client = Groq(
 #     api_key=os.getenv("GROQ_API_KEY"),
@@ -25,7 +23,7 @@ _client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY"),  # your existing key
     http_client=httpx.Client(
         verify=False,  # bypass Zscaler SSL
-        timeout=30.0,
+        timeout=LLM_TIMEOUT,  # important
     ),
 )
 
@@ -39,8 +37,8 @@ def call_llama_api(query, context):
     print(formatted_prompt)
     print("=" * 50)
     response = _client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0,
+        model=LLM_MODEL,
+        temperature=LLM_TEMPERATURE,
         messages=[
             {
                 "role": "system",
