@@ -22,3 +22,5 @@ google-generativeai
 
 numpy
 scikit-learn
+
+slowapi
